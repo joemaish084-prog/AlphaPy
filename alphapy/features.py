@@ -376,7 +376,7 @@ def get_polynomials(features, poly_degree):
                                degree=poly_degree,
                                include_bias=False)
     poly_features = polyf.fit_transform(features)
-    poly_fnames = polyf.get_feature_names()
+    poly_fnames = polyf.get_feature_names_out()
     return poly_features, poly_fnames
 
 
