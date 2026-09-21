@@ -445,40 +445,40 @@ def generate_team_frame(team, tf, home_team, away_team, window):
     # Team Loop
     for index, row in tf.iterrows():
         if team == row[home_team]:
-            tf['point_margin_game'].at[index] = get_point_margin(row, 'home.score', 'away.score')
+            tf.loc[index, 'point_margin_game'] = get_point_margin(row, 'home.score', 'away.score')
             line = row['line']
         elif team == row[away_team]:
-            tf['point_margin_game'].at[index] = get_point_margin(row, 'away.score', 'home.score')
+            tf.loc[index, 'point_margin_game'] = get_point_margin(row, 'away.score', 'home.score')
             line = -row['line']
         else:
             raise KeyError("Team not found in Team Frame")
         if index == 0:
-            tf['wins'].at[index] = get_wins(tf['point_margin_game'].at[index])
-            tf['losses'].at[index] = get_losses(tf['point_margin_game'].at[index])
-            tf['ties'].at[index] = get_ties(tf['point_margin_game'].at[index])
+            tf.loc[index, 'wins'] = get_wins(tf['point_margin_game'].at[index])
+            tf.loc[index, 'losses'] = get_losses(tf['point_margin_game'].at[index])
+            tf.loc[index, 'ties'] = get_ties(tf['point_margin_game'].at[index])
         else:
-            tf['wins'].at[index] = tf['wins'].at[index-1] + get_wins(tf['point_margin_game'].at[index])
-            tf['losses'].at[index] = tf['losses'].at[index-1] + get_losses(tf['point_margin_game'].at[index])
-            tf['ties'].at[index] = tf['ties'].at[index-1] + get_ties(tf['point_margin_game'].at[index])
-        tf['won_on_points'].at[index] = True if tf['point_margin_game'].at[index] > 0 else False
-        tf['lost_on_points'].at[index] = True if tf['point_margin_game'].at[index] < 0 else False
-        tf['cover_margin_game'].at[index] = tf['point_margin_game'].at[index] + line
-        tf['won_on_spread'].at[index] = True if tf['cover_margin_game'].at[index] > 0 else False
-        tf['lost_on_spread'].at[index] = True if tf['cover_margin_game'].at[index] <= 0 else False
+            tf.loc[index, 'wins'] = tf['wins'].at[index-1] + get_wins(tf['point_margin_game'].at[index])
+            tf.loc[index, 'losses'] = tf['losses'].at[index-1] + get_losses(tf['point_margin_game'].at[index])
+            tf.loc[index, 'ties'] = tf['ties'].at[index-1] + get_ties(tf['point_margin_game'].at[index])
+        tf.loc[index, 'won_on_points'] = True if tf['point_margin_game'].at[index] > 0 else False
+        tf.loc[index, 'lost_on_points'] = True if tf['point_margin_game'].at[index] < 0 else False
+        tf.loc[index, 'cover_margin_game'] = tf['point_margin_game'].at[index] + line
+        tf.loc[index, 'won_on_spread'] = True if tf['cover_margin_game'].at[index] > 0 else False
+        tf.loc[index, 'lost_on_spread'] = True if tf['cover_margin_game'].at[index] <= 0 else False
         nans = math.isnan(row['home.score']) or math.isnan(row['away.score'])
         if not nans:
-            tf['total_points'].at[index] = row['home.score'] + row['away.score']
+            tf.loc[index, 'total_points'] = row['home.score'] + row['away.score']
         nans = math.isnan(row['over_under'])
         if not nans:
-            tf['overunder_margin'].at[index] = tf['total_points'].at[index] - row['over_under']
-        tf['over'].at[index] = True if tf['overunder_margin'].at[index] > 0 else False
-        tf['under'].at[index] = True if tf['overunder_margin'].at[index] < 0 else False
-        tf['point_win_streak'].at[index] = get_streak(tf['won_on_points'], index, 0)
-        tf['point_loss_streak'].at[index] = get_streak(tf['lost_on_points'], index, 0)
-        tf['cover_win_streak'].at[index] = get_streak(tf['won_on_spread'], index, 0)
-        tf['cover_loss_streak'].at[index] = get_streak(tf['lost_on_spread'], index, 0)
-        tf['over_streak'].at[index] = get_streak(tf['over'], index, 0)
-        tf['under_streak'].at[index] = get_streak(tf['under'], index, 0)
+            tf.loc[index, 'overunder_margin'] = tf['total_points'].at[index] - row['over_under']
+        tf.loc[index, 'over'] = True if tf['overunder_margin'].at[index] > 0 else False
+        tf.loc[index, 'under'] = True if tf['overunder_margin'].at[index] < 0 else False
+        tf.loc[index, 'point_win_streak'] = get_streak(tf['won_on_points'], index, 0)
+        tf.loc[index, 'point_loss_streak'] = get_streak(tf['lost_on_points'], index, 0)
+        tf.loc[index, 'cover_win_streak'] = get_streak(tf['won_on_spread'], index, 0)
+        tf.loc[index, 'cover_loss_streak'] = get_streak(tf['lost_on_spread'], index, 0)
+        tf.loc[index, 'over_streak'] = get_streak(tf['over'], index, 0)
+        tf.loc[index, 'under_streak'] = get_streak(tf['under'], index, 0)
         # Handle the streaks
         if tf['point_win_streak'].at[index] > 0:
             streak = tf['point_win_streak'].at[index]
@@ -486,24 +486,24 @@ def generate_team_frame(team, tf, home_team, away_team, window):
             streak = tf['point_loss_streak'].at[index]
         else:
             streak = 1
-        tf['point_margin_streak'].at[index] = tf['point_margin_game'][index-streak+1:index+1].sum()
-        tf['point_margin_streak_avg'].at[index] = tf['point_margin_game'][index-streak+1:index+1].mean()
+        tf.loc[index, 'point_margin_streak'] = tf['point_margin_game'][index-streak+1:index+1].sum()
+        tf.loc[index, 'point_margin_streak_avg'] = tf['point_margin_game'][index-streak+1:index+1].mean()
         if tf['cover_win_streak'].at[index] > 0:
             streak = tf['cover_win_streak'].at[index]
         elif tf['cover_loss_streak'].at[index] > 0:
             streak = tf['cover_loss_streak'].at[index]
         else:
             streak = 1
-        tf['cover_margin_streak'].at[index] = tf['cover_margin_game'][index-streak+1:index+1].sum()
-        tf['cover_margin_streak_avg'].at[index] = tf['cover_margin_game'][index-streak+1:index+1].mean()
+        tf.loc[index, 'cover_margin_streak'] = tf['cover_margin_game'][index-streak+1:index+1].sum()
+        tf.loc[index, 'cover_margin_streak_avg'] = tf['cover_margin_game'][index-streak+1:index+1].mean()
         if tf['over_streak'].at[index] > 0:
             streak = tf['over_streak'].at[index]
         elif tf['under_streak'].at[index] > 0:
             streak = tf['under_streak'].at[index]
         else:
             streak = 1
-        tf['overunder_streak'].at[index] = tf['overunder_margin'][index-streak+1:index+1].sum()
-        tf['overunder_streak_avg'].at[index] = tf['overunder_margin'][index-streak+1:index+1].mean()
+        tf.loc[index, 'overunder_streak'] = tf['overunder_margin'][index-streak+1:index+1].sum()
+        tf.loc[index, 'overunder_streak_avg'] = tf['overunder_margin'][index-streak+1:index+1].mean()
     # Rolling and Expanding Variables
     tf['point_margin_season'] = tf['point_margin_game'].cumsum()
     tf['point_margin_season_avg'] = tf['point_margin_game'].expanding().mean()
@@ -805,15 +805,15 @@ def main(args=None):
 
         gf = add_features(gf, game_dict, gf.shape[0])
         for index, row in gf.iterrows():
-            gf['point_margin_game'].at[index] = get_point_margin(row, 'home.score', 'away.score')
-            gf['won_on_points'].at[index] = True if gf['point_margin_game'].at[index] > 0 else False
-            gf['lost_on_points'].at[index] = True if gf['point_margin_game'].at[index] < 0 else False
-            gf['cover_margin_game'].at[index] = gf['point_margin_game'].at[index] + row['line']
-            gf['won_on_spread'].at[index] = True if gf['cover_margin_game'].at[index] > 0 else False
-            gf['lost_on_spread'].at[index] = True if gf['cover_margin_game'].at[index] <= 0 else False
-            gf['overunder_margin'].at[index] = gf['total_points'].at[index] - row['over_under']
-            gf['over'].at[index] = True if gf['overunder_margin'].at[index] > 0 else False
-            gf['under'].at[index] = True if gf['overunder_margin'].at[index] < 0 else False
+            gf.loc[index, 'point_margin_game'] = get_point_margin(row, 'home.score', 'away.score')
+            gf.loc[index, 'won_on_points'] = True if gf['point_margin_game'].at[index] > 0 else False
+            gf.loc[index, 'lost_on_points'] = True if gf['point_margin_game'].at[index] < 0 else False
+            gf.loc[index, 'cover_margin_game'] = gf['point_margin_game'].at[index] + row['line']
+            gf.loc[index, 'won_on_spread'] = True if gf['cover_margin_game'].at[index] > 0 else False
+            gf.loc[index, 'lost_on_spread'] = True if gf['cover_margin_game'].at[index] <= 0 else False
+            gf.loc[index, 'overunder_margin'] = gf['total_points'].at[index] - row['over_under']
+            gf.loc[index, 'over'] = True if gf['overunder_margin'].at[index] > 0 else False
+            gf.loc[index, 'under'] = True if gf['overunder_margin'].at[index] < 0 else False
 
         # Generate each team frame
 
