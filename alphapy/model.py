@@ -49,6 +49,7 @@ from keras.models import load_model
 import logging
 import numpy as np
 import pandas as pd
+from sklearn.base import clone
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import RidgeCV
@@ -678,8 +679,11 @@ def first_fit(model, algo, est):
                                           random_state=seed)
         eval_set = [(X1, y1), (X2, y2)]
         eval_metric = xgb_score_map[scorer]
-        est.set_params(eval_metric=eval_metric, early_stopping_rounds=esr)
-        est.fit(X1, y1, eval_set=eval_set)
+        # Fit a clone with early stopping just to get an initial score;
+        # leave the shared estimator's params untouched since it is
+        # reused (without an eval_set) by RFECV and grid search.
+        xgb_est = clone(est).set_params(eval_metric=eval_metric, early_stopping_rounds=esr)
+        xgb_est.fit(X1, y1, eval_set=eval_set)
     else:
         est.fit(X_train, y_train)
 
