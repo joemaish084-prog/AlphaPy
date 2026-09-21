@@ -307,7 +307,7 @@ def get_day_offset(date_vector):
     """
     dv = pd.to_datetime(date_vector)
     offsets = pd.to_datetime(dv) - pd.to_datetime(dv[0])
-    day_offset = offsets.astype('timedelta64[D]').astype(int)
+    day_offset = offsets.dt.days
     return day_offset
 
 
@@ -820,6 +820,8 @@ def main(args=None):
         team_frames = {}
         teams = gf.groupby([home_team])
         for team, data in teams:
+            if isinstance(team, tuple):
+                team = team[0]
             team_frame = USEP.join([league, team.lower(), series, str(season)])
             logger.info("Generating team frame: %s", team_frame)
             tf = get_team_frame(gf, team, home_team, away_team)
@@ -844,6 +846,8 @@ def main(args=None):
         #     Assign team frame fields to respective model frame fields: set gf.at(pos, field)
 
         for team, data in teams:
+            if isinstance(team, tuple):
+                team = team[0]
             team_frame = USEP.join([league, team.lower(), series, str(season)])
             logger.info("Merging team frame %s into model frame", team_frame)
             tf = team_frames[team_frame]

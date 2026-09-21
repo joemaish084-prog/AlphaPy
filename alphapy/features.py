@@ -265,6 +265,7 @@ def impute_values(feature, dt, sentinel):
     except:
         # for numpy array
         feature = feature.reshape(-1, 1)
+    feature = feature.copy()
 
     if dt == 'float64':
         logger.info("    Imputation for Data Type %s: Median Strategy" % dt)
