@@ -678,8 +678,8 @@ def first_fit(model, algo, est):
                                           random_state=seed)
         eval_set = [(X1, y1), (X2, y2)]
         eval_metric = xgb_score_map[scorer]
-        est.fit(X1, y1, eval_set=eval_set, eval_metric=eval_metric,
-                early_stopping_rounds=esr)
+        est.set_params(eval_metric=eval_metric, early_stopping_rounds=esr)
+        est.fit(X1, y1, eval_set=eval_set)
     else:
         est.fit(X_train, y_train)
 
