@@ -246,7 +246,7 @@ def get_algos_config(cfg_dir):
 
     # Ensure each algorithm has required keys
 
-    minimum_keys = ['model_type', 'params', 'grid']
+    minimum_keys = ['model_type', 'params', 'grid', 'scoring']
     required_keys_keras = minimum_keys + ['layers', 'compiler']
     for algo in specs:
         if 'KERAS' in algo:
