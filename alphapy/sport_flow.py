@@ -682,7 +682,7 @@ def main(args=None):
     if args.train_date:
         train_date = args.train_date
     else:
-        train_date = pd.datetime(1900, 1, 1).strftime("%Y-%m-%d")
+        train_date = datetime.datetime(1900, 1, 1).strftime("%Y-%m-%d")
 
     if args.predict_date:
         predict_date = args.predict_date
