@@ -30,10 +30,17 @@ from alphapy.globals import ModelType
 from alphapy.globals import Objective
 from alphapy.globals import SSEP
 
-from keras.layers import *
-from keras.models import Sequential
-from keras.wrappers.scikit_learn import KerasClassifier
-from keras.wrappers.scikit_learn import KerasRegressor
+try:
+    from keras.layers import *
+    from keras.models import Sequential
+    from keras.wrappers.scikit_learn import KerasClassifier
+    from keras.wrappers.scikit_learn import KerasRegressor
+except ImportError:
+    # Keras/TensorFlow API has moved on; KERASC/KERASR algorithms are
+    # unavailable unless a compatible keras.wrappers.scikit_learn exists.
+    Sequential = None
+    KerasClassifier = None
+    KerasRegressor = None
 import logging
 import numpy as np
 from scipy.stats import randint as sp_randint
