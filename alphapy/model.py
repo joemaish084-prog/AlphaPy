@@ -48,6 +48,7 @@ import joblib
 from keras.models import load_model
 import logging
 import numpy as np
+import os
 import pandas as pd
 from sklearn.base import clone
 from sklearn.calibration import CalibratedClassifierCV
@@ -1197,7 +1198,7 @@ def save_predictions(model, tag, partition):
     # Read the prediction frame
     file_spec = ''.join([datasets[partition], '*'])
     file_name = most_recent_file(input_dir, file_spec)
-    file_name = file_name.split(SSEP)[-1].split(PSEP)[0]
+    file_name = os.path.basename(file_name).split(PSEP)[0]
     pf = read_frame(input_dir, file_name, extension, separator)
 
     # Cull records before the prediction date
