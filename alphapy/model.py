@@ -1209,7 +1209,7 @@ def save_predictions(model, tag, partition):
     except:
         found_pdate = False
 
-    if found_pdate:
+    if found_pdate and 'date' in pf.columns:
         pd_indices = pf[pf.date >= predict_date].index.tolist()
         pf = pf.iloc[pd_indices]
     else:
